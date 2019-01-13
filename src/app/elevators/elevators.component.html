@@ -1,5 +1,6 @@
 <div id="elevator-elevators">
-    <div class='elevator-holder' *ngFor="let elevator of elevatorsJson">
-        <elevator [id]="elevator.id" [floor]="elevator.floorNumber" [tasks]="elevator.tasks"></elevator>
+    <div class='elevator-holder' *ngFor="let elevator of elevators$ | async">
+        {{elevator | json}}
+        <elevator [el]="elevator"></elevator>
     </div>
 </div>
