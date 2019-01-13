@@ -1,12 +1,15 @@
 # Elevators
 
-## Instalation:
-  `$ git clone https://github.com/itayod/elevators-app.git`.
+## Installation and Run:
+  ```
+  $ git clone https://github.com/itayod/elevators-app.git
   
-  `$ cd elevators-app`.
+  $ cd elevators-app
   
-  `$ npm i`.
+  $ npm i
   
+  $ npm start
+  ```
 
 ## Product Requeremnts:
 
