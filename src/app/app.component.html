@@ -1,0 +1,14 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+    <h1>
+        Welcome to {{title}}!!
+    </h1>
+    <div id="elevator-app">
+        <button id="add-elevator-button" (click)="addElevator()">addElevator</button>
+        <app-floors (floorSelected)="onFloorSelected($event)"></app-floors>
+        <elevators>
+        </elevators>
+    </div>
+
+</div>
+

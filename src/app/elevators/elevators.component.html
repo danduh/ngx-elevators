@@ -1,0 +1,5 @@
+<div id="elevator-elevators">
+    <div class='elevator-holder' *ngFor="let elevator of elevatorsJson">
+        <elevator [id]="elevator.id" [floor]="elevator.floorNumber" [tasks]="elevator.tasks"></elevator>
+    </div>
+</div>

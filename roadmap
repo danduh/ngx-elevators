@@ -1,0 +1,8 @@
+# create an app component that will be our main component and will connect between the components.
+# create an elevators component that will hold the elevators.
+# create elevators service that will create the elevators and manage them.
+# create elevator object that will hold the elevator info.
+# create task object that will hold the task info.
+# create elevator component that will display the elevator on the view.
+# create task component that will display the task on the view.
+# create floors component that will display the floors.
