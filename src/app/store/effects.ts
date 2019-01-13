@@ -51,14 +51,14 @@ export class ExpertsEffects {
         this.store
             .pipe(
                 select(selectAllElevators),
-                map((els) => {
-                    return els.sort((a, b) => {
-                        return clacTime(a.destFloor || a.initFloor, floor, a.endTime)
-                            - clacTime(b.destFloor || b.initFloor, floor, b.endTime);
-                    })[0]
-                })
             )
-            .subscribe(el => fastest = el);
+            .subscribe(els => {
+                fastest = [...els].sort((a, b) => {
+                    return clacTime(a.destFloor || a.initFloor, floor, a.endTime)
+                        - clacTime(b.destFloor || b.initFloor, floor, b.endTime);
+                })[0]
+            });
+
         return fastest
     }
 }

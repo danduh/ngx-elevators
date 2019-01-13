@@ -20,9 +20,6 @@ export class ElevatorsComponent implements OnInit {
 
     constructor(protected elevatorsService: ElevatorsService,
                 private store: Store<any>) {
-        this.elevatorsServiceEvents = elevatorsService.getEvents();
-        this.elevatorsServiceEvents.on('elevatorsChanged', this.onElevatorsChanged.bind(this))
-        this.elevatorsServiceEvents.on('taskArrivedToDest', this.onTaskArrivedToDest.bind(this))
     }
 
     ngOnInit() {
