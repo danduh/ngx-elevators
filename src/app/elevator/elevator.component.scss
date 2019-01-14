@@ -1,5 +1,8 @@
 :host {
     position: relative;
+    display: block;
+    height: 62px;
+
 }
 
 .task {
@@ -10,8 +13,9 @@
 .elevator-elevator {
     display: block;
     width: 80%;
-    bottom: 0;
-    position: absolute;
+    //position: absolute;
+    //transition: all 2s ease 0s;
+    //top: 0;
 }
 
 .elevator {
@@ -22,5 +26,5 @@
     position: relative;
     margin: 1px;
     bottom: 0;
-    transition: top 0.5s;
+    transition: translate 0.5s;
 }

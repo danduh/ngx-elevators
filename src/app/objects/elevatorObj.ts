@@ -112,7 +112,7 @@ export default class ElevatorObj {
     }
 
     onTaskEnded(task) {
-        console.log(task)
+        // console.log(task)
         this.endTask(task);
         let firstTask = this._tasks.shift();
         if (firstTask) {

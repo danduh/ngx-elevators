@@ -1,7 +1,7 @@
 <div id="elevator-floors">
     <div *ngFor="let floor of floors">
         <div class='floor' (click)="selectFloor(floor)" [ngStyle]="{'height':getFloorHeight()}">
-            <div [ngClass]="{'metal': true, 'active': floor.active}"> {{floor.number}}</div>
+            <div [ngClass]="{'metal': true, 'active': floor.active}"> {{floor.distFloor}}</div>
         </div>
         <div class="blackline"></div>
     </div>

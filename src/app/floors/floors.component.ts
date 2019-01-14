@@ -35,19 +35,19 @@ export class FloorsComponent implements OnInit {
     }
 
     onTaskAdded(data) {
-        let floor: any = _.find(this.floors, {number: data.task.getDestFloor()});
+        let floor: any = _.find(this.floors, {distFloor: data.task.getDestFloor()});
         floor.active = true;
     }
 
     onTaskEnded(data) {
-        let floor: any = _.find(this.floors, {number: data.task.getDestFloor()});
+        let floor: any = _.find(this.floors, {distFloor: data.task.getDestFloor()});
         floor.active = false;
     }
 
     selectFloor(floor) {
-        this.store.dispatch(new OrderElevatorAction(floor))
+        this.store.dispatch(new OrderElevatorAction(floor));
         if (!floor.active) {
-            this.floorSelected.emit(floor.number)
+            this.floorSelected.emit(floor.distFloor)
         }
     }
 
@@ -55,7 +55,7 @@ export class FloorsComponent implements OnInit {
         let floors = [];
         for (var i = min; i < (max + 1); i++) {
             let floorObj = {
-                number: i,
+                distFloor: i,
                 active: false
             }
             floors.push(floorObj);

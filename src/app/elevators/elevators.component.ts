@@ -3,8 +3,8 @@ import {ElevatorsService} from '../services/elevators.service';
 import AppConstants from '../constants';
 import {select, Store} from '@ngrx/store';
 import {Observable} from 'rxjs/internal/Observable';
-import {selectAll, selectAllElevators} from 'app/store';
-import {filter, map, tap} from 'rxjs/operators';
+import {selectAll, selectAllElevators, selectElevatorsIDs, selectElevatorsTotal} from 'app/store';
+import {distinctUntilChanged, filter, map, mergeMap, tap} from 'rxjs/operators';
 
 @Component({
     selector: 'elevators',
@@ -25,12 +25,16 @@ export class ElevatorsComponent implements OnInit {
     ngOnInit() {
         this.elevators$ = this.store
             .pipe(
-                select(selectAllElevators),
-                map((els) => els.sort((a, b) => a.number - b.number)),
-                tap(console.table)
+                select(selectElevatorsIDs),
+                distinctUntilChanged(),
+                tap(console.log)
             );
 
         this.elevatorsJson = this.elevatorsService.getElevatorsJson();
+    }
+
+    updateElevatorsList() {
+
     }
 
     onElevatorsChanged(elvatorsJson) {

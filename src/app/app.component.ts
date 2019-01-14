@@ -23,7 +23,7 @@ export class AppComponent {
 
     constructor(elevatorsService: ElevatorsService,
                 private store: Store<any>) {
-        this.elevatorsService = elevatorsService;
+    this.elevatorsService = elevatorsService;
     }
 
     addElevator() {
@@ -32,8 +32,9 @@ export class AppComponent {
             initFloor: 0,
             destFloor: null,
             endTime: null,
-            number: this.numbers++
-        }
+            number: this.numbers++,
+            que: []
+        };
 
         this.store.dispatch(new AddElevatorActions(el));
         let elevator = this.elevatorsService.addElevator(this._defaultStoppingTimeAtFloor, this._defaultTimeBetweenFloors, this._defaultCurrentFloor);
@@ -41,7 +42,7 @@ export class AppComponent {
     }
 
     onFloorSelected(floorNumber: number) {
-        this.elevatorsService.addNewTask(floorNumber);
+        // this.elevatorsService.addNewTask(floorNumber);
     }
 
 }
