@@ -10,7 +10,7 @@ import {
     OrderElevatorAction,
     SendElevatorActions
 } from './actions';
-import {filter, map, mapTo, switchMap, tap} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import {getElevatorById, selectAllElevators} from './index';
 import {Elevator} from '../elevators.types';
 
@@ -79,7 +79,7 @@ export class ExpertsEffects {
 
                 actionsToReturn.push(new ElevatorReleased(action.payload));
 
-                if (!!dist || dist === 0) {
+                if (!!dist) {
                     // FromQue
                     actionsToReturn.push(new OrderElevatorAction({distFloor: dist, elevatorId: action.payload.id}));
                 }
