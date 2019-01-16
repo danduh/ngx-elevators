@@ -16,4 +16,4 @@
 Elevator simulator
 
 
-ng build --prod --base-href "https://username.github.io/ngx-elevators/"
+ng build --prod --base-href "https://username.github.io/ngx-elevators/dist/"
