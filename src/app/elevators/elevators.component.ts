@@ -1,41 +1,53 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ElevatorsService} from '../services/elevators.service';
-import ElevatorObj from '../objects/elevatorObj';
 import AppConstants from '../constants';
+import {select, Store} from '@ngrx/store';
+import {Observable} from 'rxjs/internal/Observable';
+import {selectAll, selectAllElevators, selectElevatorsIDs, selectElevatorsTotal} from 'app/store';
+import {distinctUntilChanged, filter, map, mergeMap, tap} from 'rxjs/operators';
 
 @Component({
-  selector: 'elevators',
-  templateUrl: './elevators.component.html',
-  styleUrls: ['./elevators.component.scss'],
-  providers: [ElevatorsService]
+    selector: 'elevators',
+    templateUrl: './elevators.component.html',
+    styleUrls: ['./elevators.component.scss'],
+    providers: [ElevatorsService]
 })
 
 export class ElevatorsComponent implements OnInit {
+    elevators$: Observable<any>;
+    elevatorsJson: any[];
+    elevatorsServiceEvents: any;
 
-  elevatorsJson: any[];
-  elevatorsServiceEvents: any;
+    constructor(protected elevatorsService: ElevatorsService,
+                private store: Store<any>) {
+    }
 
-  constructor(protected elevatorsService: ElevatorsService) {
-    this.elevatorsServiceEvents = elevatorsService.getEvents();
-    this.elevatorsServiceEvents.on('elevatorsChanged',this.onElevatorsChanged.bind(this))
-    this.elevatorsServiceEvents.on('taskArrivedToDest',this.onTaskArrivedToDest.bind(this))
-  }
+    ngOnInit() {
+        this.elevators$ = this.store
+            .pipe(
+                select(selectElevatorsIDs),
+                distinctUntilChanged(),
+                tap(console.log)
+            );
 
-  ngOnInit() {
-    this.elevatorsJson = this.elevatorsService.getElevatorsJson();
-  }
+        this.elevatorsJson = this.elevatorsService.getElevatorsJson();
+    }
 
-  onElevatorsChanged(elvatorsJson) {
-    this.elevatorsJson = elvatorsJson;
-  }
+    updateElevatorsList() {
 
-  onTaskArrivedToDest() {
-    this._playDing();
-  }
+    }
 
-  _playDing() {
-    let audio = new Audio(AppConstants.ASSETS_URL+'ding.mp3');
-    audio.play();
-  }
+    onElevatorsChanged(elvatorsJson) {
+        this.elevatorsJson = elvatorsJson;
+    }
+
+    onTaskArrivedToDest() {
+        this._playDing();
+    }
+
+    _playDing() {
+        let audio = new Audio(AppConstants.ASSETS_URL + 'ding.mp3');
+        audio.play();
+    }
 
 }

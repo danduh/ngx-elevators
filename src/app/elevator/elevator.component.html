@@ -1,7 +1,3 @@
-<div id="elevator-elevator">
-    <img class='elevator' src="./../../assets/elv.png" id="{{elementId}}">
-</div>
-<div class="task" *ngFor="let task of tasks">
-    <elevator-task [id]="task.id" [taskTotalTime]="task.taskTotalTime"
-                   [taskDestFloor]="task.taskDestFloor"></elevator-task>
+<div class="elevator-elevator" #elevElem>
+    <img class='elevator' src="./../../assets/elv.png" id="{{el.id}}">
 </div>
