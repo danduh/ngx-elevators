@@ -49,7 +49,7 @@ export interface ElevQuesState extends EntityState<ElevQue> {
 export const queAdapter: EntityAdapter<ElevQue> =
     createEntityAdapter<ElevQue>(
         {
-            selectId: (que: ElevQue) => que.id,
+            selectId: (que: ElevQue) => que.elevatorId
         });
 
 export const initialQueElevatorsState: ElevQuesState = queAdapter.getInitialState();
