@@ -3,10 +3,12 @@ import AppConstants from './../constants';
 import {Elevator} from '../elevators.types';
 import {select, Store} from '@ngrx/store';
 import {getElevatorById} from '../store';
-import {distinctUntilChanged, filter, take, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, take, takeUntil} from 'rxjs/operators';
 import {ELEV} from '../store/effects';
 import {animate, animation, AnimationKeyframesSequenceMetadata, style} from '@angular/animations';
 import {ElevatorReleased, ElevatorToBeReleased} from '../store/actions';
+import {timer} from 'rxjs/internal/observable/timer';
+import {interval} from 'rxjs/internal/observable/interval';
 
 animation([
     style({
@@ -27,6 +29,9 @@ export class ElevatorComponent implements OnInit, OnChanges {
     el: Elevator;
     animation: Animation;
 
+    private timeLeft: number;
+    public subscribeTimer;
+
     public position = 0;
 
     constructor(private store: Store<any>) {
@@ -35,6 +40,23 @@ export class ElevatorComponent implements OnInit, OnChanges {
     ngOnInit() {
         this.getElevatorFromStore();
         this.subscribeToElevatorChanges();
+    }
+
+
+    private endTime() {
+        const source = interval(100);
+
+        const abc = source
+
+            .pipe(map(ind => ind * 100))
+
+            .subscribe(val => {
+                this.subscribeTimer = this.timeLeft - val;
+                if (this.subscribeTimer <= 10) {
+                    this.subscribeTimer = 0;
+                    abc.unsubscribe();
+                }
+            });
     }
 
     getElevatorFromStore() {
@@ -65,7 +87,7 @@ export class ElevatorComponent implements OnInit, OnChanges {
     }
 
     sendElevator(el: Elevator) {
-        console.log('sss');
+
         const runTo = ((el.initFloor - el.destFloor) * ELEV.FLOOR_SIZE) + this.position;
         const runTime = Math.abs((el.initFloor - el.destFloor) * ELEV.RUN_TIME);
         // this.elevElem.nati veElement.top = runLength + 'px';
@@ -90,6 +112,10 @@ export class ElevatorComponent implements OnInit, OnChanges {
                 this.store.dispatch(new ElevatorToBeReleased(el))
             }, ELEV.IDLE_TIME)
         }
+
+        this.timeLeft = el.endTime - Date.now();
+        this.endTime();
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {

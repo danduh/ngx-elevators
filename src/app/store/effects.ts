@@ -70,7 +70,7 @@ export class ExpertsEffects {
                 const actionsToReturn = [];
                 let dist;
                 action.payload.initFloor = action.payload.destFloor;
-                // action.payload.endTime = null;
+                action.payload.endTime = null;
                 action.payload.ordered = false;
 
                 if (action.payload.que.length > 0) {
@@ -79,7 +79,8 @@ export class ExpertsEffects {
 
                 actionsToReturn.push(new ElevatorReleased(action.payload));
 
-                if (!!dist) {
+                // if (!!dist ) {
+                if (!!dist || dist === 0) {
                     // FromQue
                     actionsToReturn.push(new OrderElevatorAction({distFloor: dist, elevatorId: action.payload.id}));
                 }
