@@ -19,8 +19,18 @@ div#elevator-floors {
         background-size: 58px 58px;
         background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
         cursor: pointer;
-
+        position: relative;
         width: 100px;
+    }
+
+    .floor:after {
+        background-color: #000;
+        bottom: 0;
+        content: '';
+        display: block;
+        height: 7px;
+        position: absolute;
+        width: 100%;
     }
 
     .metal {
@@ -60,10 +70,5 @@ div#elevator-floors {
         hsla(210, 100%, 75%, .8) 0 0px 3px 2px, /* outer SD */
         hsla(210, 50%, 40%, .0) 0 -5px 6px 4px, /* outer SD */
         hsla(210, 80%, 95%, 0) 0 5px 6px 4px; /* outer HL */
-    }
-
-    ﻿.blackline {
-        height: 7px;
-        background-color: #000000;
     }
 }
