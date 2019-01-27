@@ -46,30 +46,33 @@ export class ExpertsEffects {
                     // console.log('Expected UNKNOWN', sndEl.ordered)
                 }
 
+                const floor = this.getFloorByID(action.payload.floorId);
+
+                if (floor) {
+                    floor.active = action.payload.active;
+                    actionsToReturn.push(new UpdateFloor(floor));
+                } else {
+                    actionsToReturn.push(new AddFloor({
+                        ...action.payload,
+                        que: [
+                            sndEl.id
+                        ]
+                    }));
+                }
+
                 if (sndEl.ordered) {
                     sndEl.finalFloor = action.payload.floorId;
                     sndEl.que.push(action.payload.floorId);
                     sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
+
+                    if (floor) {
+                        floor.que.push(sndEl.id);
+                        actionsToReturn.push(new UpdateFloor(floor));
+                    }
                 } else {
                     sndEl.destFloor = action.payload.floorId;
                     sndEl.ordered = true;
                     sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
-
-                    const floor = this.getFloorByID(action.payload.floorId);
-
-                    if (floor) {
-                        floor.active = true;
-                        floor.que.push(sndEl.id);
-                        actionsToReturn.push(new UpdateFloor(floor));
-                    } else {
-                        actionsToReturn.push(new AddFloor({
-                            active: true,
-                            floorId: action.payload.floorId,
-                            que: [
-                                sndEl.id
-                            ]
-                        }));
-                    }
 
                     actionsToReturn.push(new SendElevatorActions(sndEl));
                 }

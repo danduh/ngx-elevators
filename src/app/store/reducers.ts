@@ -50,7 +50,7 @@ export function floorReducer(state = initialFloorState, action) {
         }
 
         case FloorActions.UPDATE_FLOOR: {
-            return floorAdapter.updateOne(action.payload, state);
+            return floorAdapter.upsertOne(action.payload, state);
         }
 
         default:

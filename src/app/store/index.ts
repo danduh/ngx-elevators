@@ -47,14 +47,14 @@ export const {
     selectTotal: floorTotal,
 } = floorAdapter.getSelectors();
 
-export const selectFloorEntities = createSelector(
+export const getFloorEntities = createSelector(
     getFloorState,
     floorEntities
 );
 
 export const getFloorById = () => {
     return createSelector(
-        selectFloorEntities,
+        getFloorEntities,
         (entities: Dictionary<Floor>, props: { id: string }) => {
             return entities[props.id];
         },
