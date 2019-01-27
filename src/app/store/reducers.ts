@@ -1,10 +1,8 @@
 import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
-import {Elevator, ElevQue} from '../elevators.types';
+import {Elevator, ElevQue} from '../app.types';
 import {ElevatorActions, QueActions} from './actions';
 
-export interface ElevatorsState extends EntityState<Elevator> {
-}
-
+export interface ElevatorsState extends EntityState<Elevator> { }
 
 export const adapter: EntityAdapter<Elevator> =
     createEntityAdapter<Elevator>(
@@ -41,10 +39,7 @@ export function elevatorReducer(state = initialElevatorsState, action) {
     }
 }
 
-
-export interface ElevQuesState extends EntityState<ElevQue> {
-}
-
+export interface ElevQuesState extends EntityState<ElevQue> { }
 
 export const queAdapter: EntityAdapter<ElevQue> =
     createEntityAdapter<ElevQue>(
@@ -54,12 +49,10 @@ export const queAdapter: EntityAdapter<ElevQue> =
 
 export const initialQueElevatorsState: ElevQuesState = queAdapter.getInitialState();
 
-
 export function queElevatorReducer(state = initialQueElevatorsState, action) {
     switch (action.type) {
 
         case QueActions.ADD_FLOOR_TO_QUE: {
-
             return queAdapter.addOne(action.payload, state);
         }
 
