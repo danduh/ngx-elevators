@@ -1,14 +1,12 @@
-import {Component, OnInit, Input, SimpleChanges, AfterViewInit, OnChanges, ViewChild, ElementRef, ChangeDetectorRef} from '@angular/core';
-import AppConstants from './../constants';
-import {Elevator} from '../elevators.types';
-import {select, Store} from '@ngrx/store';
-import {getElevatorById} from '../store';
-import {distinctUntilChanged, filter, map, take, takeUntil} from 'rxjs/operators';
-import {ELEV} from '../store/effects';
-import {animate, animation, AnimationKeyframesSequenceMetadata, style} from '@angular/animations';
-import {ElevatorReleased, ElevatorToBeReleased} from '../store/actions';
-import {timer} from 'rxjs/internal/observable/timer';
-import {interval} from 'rxjs/internal/observable/interval';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { animate, animation, style } from '@angular/animations';
+import { select, Store } from '@ngrx/store';
+import { getElevatorById } from '../store';
+import { ElevatorToBeReleased } from '../store/actions';
+import { filter, map, take } from 'rxjs/operators';
+import { interval } from 'rxjs/internal/observable/interval';
+import { Elevator } from '../app.types';
+import { FLOOR_SIZE, ELEVATOR_RUN_TIME, ELEVATOR_IDLE_TIME } from '../app.constants';
 
 animation([
     style({
@@ -18,14 +16,16 @@ animation([
 ]);
 
 @Component({
-    selector: 'elevator',
+    selector: 'app-elevator',
     templateUrl: './elevator.component.html',
     styleUrls: ['./elevator.component.scss'],
 })
-export class ElevatorComponent implements OnInit, OnChanges {
+export class ElevatorComponent implements OnInit {
     @ViewChild('elevElem') elevElem: ElementRef;
+
     @Input() floor: number;
     @Input() elId: string;
+
     el: Elevator;
     animation: Animation;
 
@@ -75,21 +75,12 @@ export class ElevatorComponent implements OnInit, OnChanges {
                 filter(el => el.ordered === true),
             )
             .subscribe(this.sendElevator.bind(this));
-
-        // this.store
-        //     .pipe(
-        //         select(getElevatorById(), {id: this.elId}),
-        //         filter(el => el.ordered === false && el.que.length > 0),
-        //     )
-        //     .subscribe((el) => {
-        //         console.log('edded or removed', el.que)
-        //     })
     }
 
     sendElevator(el: Elevator) {
 
-        const runTo = ((el.initFloor - el.destFloor) * ELEV.FLOOR_SIZE) + this.position;
-        const runTime = Math.abs((el.initFloor - el.destFloor) * ELEV.RUN_TIME);
+        const runTo = ((el.initFloor - el.destFloor) * FLOOR_SIZE) + this.position;
+        const runTime = Math.abs((el.initFloor - el.destFloor) * ELEVATOR_RUN_TIME);
         // this.elevElem.nati veElement.top = runLength + 'px';
 
         const animeOpts = {
@@ -110,19 +101,12 @@ export class ElevatorComponent implements OnInit, OnChanges {
             setTimeout(() => {
                 el.ordered = false;
                 this.store.dispatch(new ElevatorToBeReleased(el))
-            }, ELEV.IDLE_TIME)
-        }
+            }, ELEVATOR_IDLE_TIME)
+        };
 
         this.timeLeft = el.endTime - Date.now();
         this.endTime();
 
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log(changes);
-        if (changes['floor']) {
-
-        }
     }
 
 }

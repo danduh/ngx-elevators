@@ -3,23 +3,25 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ElevatorComponent } from './elevator.component';
 
 describe('ElevatorComponent', () => {
-  let component: ElevatorComponent;
-  let fixture: ComponentFixture<ElevatorComponent>;
+    let component: ElevatorComponent;
+    let fixture: ComponentFixture<ElevatorComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ElevatorComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [
+                ElevatorComponent
+            ]
+        })
+            .compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ElevatorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(ElevatorComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(component).toBeTruthy();
+    });
 });
