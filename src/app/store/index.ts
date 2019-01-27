@@ -1,8 +1,13 @@
-import {adapter, elevatorReducer, initialElevatorsState, queAdapter, queElevatorReducer} from './reducers';
-import {createFeatureSelector, createSelector} from '@ngrx/store';
-import {Dictionary} from '@ngrx/entity';
-import {Elevator} from '../elevators.types';
-
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { Dictionary } from '@ngrx/entity';
+import { Elevator } from '../app.types';
+import {
+    adapter,
+    elevatorReducer,
+    initialElevatorsState,
+    queAdapter,
+    queElevatorReducer
+} from './reducers';
 
 export const getElevatorsState = createFeatureSelector<any>('elevator');
 
@@ -12,7 +17,6 @@ export const {
     selectAll,
     selectTotal,
 } = adapter.getSelectors();
-
 
 export const selectAllElevators = createSelector(
     getElevatorsState,
@@ -61,9 +65,6 @@ export const getQueByDistFlor = () => {
         },
     );
 };
-
-
-
 
 export const reducers = {
     elevator: elevatorReducer,
