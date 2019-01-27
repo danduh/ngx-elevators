@@ -1,13 +1,7 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { Dictionary } from '@ngrx/entity';
-import { Elevator } from '../app.types';
-import {
-    adapter,
-    elevatorReducer,
-    initialElevatorsState,
-    queAdapter,
-    queElevatorReducer
-} from './reducers';
+import { Elevator, Floor } from '../app.types';
+import { adapter, elevatorReducer, floorAdapter, floorReducer } from './reducers';
 
 export const getElevatorsState = createFeatureSelector<any>('elevator');
 
@@ -35,7 +29,6 @@ export const selectElevatorsIDs = createSelector(
 
 export const getElevatorsEntities = createSelector(getElevatorsState, selectEntities);
 
-
 export const getElevatorById = () => {
     return createSelector(
         getElevatorsEntities,
@@ -45,22 +38,24 @@ export const getElevatorById = () => {
     );
 };
 
-export const getQueState = createFeatureSelector<any>('que');
+export const getFloorState = createFeatureSelector<any>('floor');
 
 export const {
-    selectIds: queIds,
-    selectEntities: queEntities,
-    selectAll: queAll,
-    selectTotal: queTotal,
-} = queAdapter.getSelectors();
+    selectIds: floorIds,
+    selectEntities: floorEntities,
+    selectAll: floorAll,
+    selectTotal: floorTotal,
+} = floorAdapter.getSelectors();
 
+export const selectFloorEntities = createSelector(
+    getFloorState,
+    floorEntities
+);
 
-export const getQueEntities = createSelector(getQueState, queEntities);
-
-export const getQueByDistFlor = () => {
+export const getFloorById = () => {
     return createSelector(
-        getElevatorsEntities,
-        (entities: Dictionary<Elevator>, props: { id: string }) => {
+        selectFloorEntities,
+        (entities: Dictionary<Floor>, props: { id: string }) => {
             return entities[props.id];
         },
     );
@@ -68,5 +63,5 @@ export const getQueByDistFlor = () => {
 
 export const reducers = {
     elevator: elevatorReducer,
-    que: queElevatorReducer
+    floor: floorReducer
 };
