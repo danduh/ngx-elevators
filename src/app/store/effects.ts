@@ -46,8 +46,6 @@ export class ExpertsEffects {
                     // console.log('Expected UNKNOWN', sndEl.ordered)
                 }
 
-
-
                 if (sndEl.ordered) {
                     sndEl.finalFloor = action.payload.floorId;
                     sndEl.que.push(action.payload.floorId);
@@ -87,11 +85,6 @@ export class ExpertsEffects {
         switchMap((action) => {
                 const actionsToReturn = [];
 
-                const floor = this.getFloorByID(action.payload.destFloor);
-
-                floor.que.shift();
-                actionsToReturn.push(new UpdateFloor(floor));
-
                 let dist;
 
                 action.payload.initFloor = action.payload.destFloor;
@@ -107,6 +100,7 @@ export class ExpertsEffects {
                 if (!!dist || dist === 0) {
                     actionsToReturn.push(
                         new OrderElevatorAction({
+                            active: true,
                             floorId: dist,
                             elevatorId: action.payload.id
                         })
@@ -123,6 +117,8 @@ export class ExpertsEffects {
         ofType<ElevatorReleased>(ElevatorActions.RELEASED),
         map((action) => {
                 const floor = this.getFloorByID(action.payload.destFloor);
+
+                floor.que.shift();
 
                 if (floor.que.length === 0) {
                     floor.active = false;
