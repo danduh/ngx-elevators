@@ -8,8 +8,9 @@ export enum ElevatorActions {
     RELEASED = '[ElevatorsActions] Elevator released and free to use',
 }
 
-export enum QueActions {
-    ADD_FLOOR_TO_QUE = '[QueActions] Add Floor to QUE'
+export enum FloorActions {
+    ADD_FLOOR = '[FloorActions] Add Floor',
+    UPDATE_FLOOR = '[FloorActions] Update Floor'
 }
 
 export class OrderElevatorAction {
@@ -52,8 +53,16 @@ export class ElevatorReleased {
     }
 }
 
-export class AddFloorToElevatorQue {
-    readonly type = QueActions.ADD_FLOOR_TO_QUE;
+export class AddFloor {
+    readonly type = FloorActions.ADD_FLOOR;
+
+    constructor(public payload) {
+
+    }
+}
+
+export class UpdateFloor {
+    readonly type = FloorActions.UPDATE_FLOOR;
 
     constructor(public payload) {
 
