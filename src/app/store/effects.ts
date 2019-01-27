@@ -3,14 +3,15 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { map, switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
-import { getElevatorById, selectAllElevators } from './index';
+import { getElevatorById, selectAllElevators, getFloorById } from './index';
 import {
-    AddFloorToElevatorQue,
     ElevatorActions,
     ElevatorReleased,
     ElevatorToBeReleased,
     OrderElevatorAction,
-    SendElevatorActions
+    SendElevatorActions,
+    AddFloor,
+    UpdateFloor
 } from './actions';
 import { Elevator } from '../app.types';
 import { ELEVATOR_RUN_TIME, ELEVATOR_IDLE_TIME } from '../app.constants';
@@ -32,34 +33,50 @@ export class ExpertsEffects {
     @Effect()
     orderElevator$: Observable<Action> = this.actions$.pipe(
         ofType<OrderElevatorAction>(ElevatorActions.ORDER_ELEVATOR),
-        map((action) => {
+        switchMap((action) => {
+                const actionsToReturn = [];
+
                 let sndEl: Elevator;
 
                 if (!!action.payload.elevatorId) {
                     sndEl = this.getElevatorByID(action.payload.elevatorId);
-                    console.log('Expected FALSE', sndEl.ordered)
+                    // console.log('Expected FALSE', sndEl.ordered)
                 } else {
-                    sndEl = this.findElevator(action.payload.distFloor);
-                    console.log('Expected UKNOWN', sndEl.ordered)
+                    sndEl = this.findElevator(action.payload.floorId);
+                    // console.log('Expected UNKNOWN', sndEl.ordered)
                 }
 
+
+
                 if (sndEl.ordered) {
-                    sndEl.finalFloor = action.payload.distFloor;
-                    sndEl.que.push(action.payload.distFloor);
+                    sndEl.finalFloor = action.payload.floorId;
+                    sndEl.que.push(action.payload.floorId);
                     sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
-
-                    return new AddFloorToElevatorQue({
-                        id: sndEl.id,
-                        distFloor: action.payload.distFloor
-                    });
-
                 } else {
-                    sndEl.destFloor = action.payload.distFloor;
+                    sndEl.destFloor = action.payload.floorId;
                     sndEl.ordered = true;
                     sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
 
-                    return new SendElevatorActions(sndEl);
+                    const floor = this.getFloorByID(action.payload.floorId);
+
+                    if (floor) {
+                        floor.active = true;
+                        floor.que.push(sndEl.id);
+                        actionsToReturn.push(new UpdateFloor(floor));
+                    } else {
+                        actionsToReturn.push(new AddFloor({
+                            active: true,
+                            floorId: action.payload.floorId,
+                            que: [
+                                sndEl.id
+                            ]
+                        }));
+                    }
+
+                    actionsToReturn.push(new SendElevatorActions(sndEl));
                 }
+
+                return actionsToReturn;
             }
         )
     );
@@ -69,6 +86,11 @@ export class ExpertsEffects {
         ofType<ElevatorToBeReleased>(ElevatorActions.TO_BE_RELEASED),
         switchMap((action) => {
                 const actionsToReturn = [];
+
+                const floor = this.getFloorByID(action.payload.destFloor);
+
+                floor.que.shift();
+                actionsToReturn.push(new UpdateFloor(floor));
 
                 let dist;
 
@@ -85,7 +107,7 @@ export class ExpertsEffects {
                 if (!!dist || dist === 0) {
                     actionsToReturn.push(
                         new OrderElevatorAction({
-                            distFloor: dist,
+                            floorId: dist,
                             elevatorId: action.payload.id
                         })
                     );
@@ -94,6 +116,21 @@ export class ExpertsEffects {
                 return actionsToReturn;
             }
         ),
+    );
+
+    @Effect()
+    releasedElevator$: Observable<Action> = this.actions$.pipe(
+        ofType<ElevatorReleased>(ElevatorActions.RELEASED),
+        map((action) => {
+                const floor = this.getFloorByID(action.payload.destFloor);
+
+                if (floor.que.length === 0) {
+                    floor.active = false;
+                }
+
+                return new UpdateFloor(floor);
+            }
+        )
     );
 
     /**
@@ -126,7 +163,19 @@ export class ExpertsEffects {
             )
             .subscribe(els => elev = els);
 
-        return elev
+        return elev;
+    }
+
+    getFloorByID(id) {
+        let floor;
+
+        this.store
+            .pipe(
+                select(getFloorById(), {id}),
+            )
+            .subscribe(fls => floor = fls);
+
+        return floor;
     }
 
     constructor(
