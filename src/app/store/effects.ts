@@ -1,7 +1,9 @@
-import {Actions, Effect, ofType} from '@ngrx/effects';
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/internal/Observable';
-import {Action, select, Store} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Action, select, Store } from '@ngrx/store';
+import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs/internal/Observable';
+import { getElevatorById, selectAllElevators } from './index';
 import {
     AddFloorToElevatorQue,
     ElevatorActions,
@@ -10,15 +12,8 @@ import {
     OrderElevatorAction,
     SendElevatorActions
 } from './actions';
-import {map, switchMap} from 'rxjs/operators';
-import {getElevatorById, selectAllElevators} from './index';
-import {Elevator} from '../elevators.types';
-
-export const ELEV = {
-    RUN_TIME: 500,
-    IDLE_TIME: 2000,
-    FLOOR_SIZE: 62
-};
+import { Elevator } from '../app.types';
+import { ELEVATOR_RUN_TIME, ELEVATOR_IDLE_TIME } from '../app.constants';
 
 /**
  *
@@ -26,13 +21,14 @@ export const ELEV = {
  * @param dist -> ordered floor
  * @param endTime -> timestamp when elevator is free
  */
-function clacTime(initFlor, dist, endTime): number {
+function calcTime(initFlor, dist, endTime): number {
     const _t: number = endTime || Date.now();
-    return _t + (Math.abs(initFlor - dist) * ELEV.RUN_TIME) + ELEV.IDLE_TIME
+    return _t + (Math.abs(initFlor - dist) * ELEVATOR_RUN_TIME) + ELEVATOR_IDLE_TIME
 }
 
 @Injectable()
 export class ExpertsEffects {
+
     @Effect()
     orderElevator$: Observable<Action> = this.actions$.pipe(
         ofType<OrderElevatorAction>(ElevatorActions.ORDER_ELEVATOR),
@@ -50,13 +46,18 @@ export class ExpertsEffects {
                 if (sndEl.ordered) {
                     sndEl.finalFloor = action.payload.distFloor;
                     sndEl.que.push(action.payload.distFloor);
-                    sndEl.endTime = clacTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
-                    return new AddFloorToElevatorQue({id: sndEl.id, distFloor: action.payload.distFloor});
+                    sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
+
+                    return new AddFloorToElevatorQue({
+                        id: sndEl.id,
+                        distFloor: action.payload.distFloor
+                    });
 
                 } else {
                     sndEl.destFloor = action.payload.distFloor;
                     sndEl.ordered = true;
-                    sndEl.endTime = clacTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
+                    sndEl.endTime = calcTime(sndEl.initFloor, sndEl.destFloor, sndEl.endTime);
+
                     return new SendElevatorActions(sndEl);
                 }
             }
@@ -68,7 +69,9 @@ export class ExpertsEffects {
         ofType<ElevatorToBeReleased>(ElevatorActions.TO_BE_RELEASED),
         switchMap((action) => {
                 const actionsToReturn = [];
+
                 let dist;
+
                 action.payload.initFloor = action.payload.destFloor;
                 action.payload.endTime = null;
                 action.payload.ordered = false;
@@ -79,21 +82,19 @@ export class ExpertsEffects {
 
                 actionsToReturn.push(new ElevatorReleased(action.payload));
 
-                // if (!!dist ) {
                 if (!!dist || dist === 0) {
-                    // FromQue
-                    actionsToReturn.push(new OrderElevatorAction({distFloor: dist, elevatorId: action.payload.id}));
+                    actionsToReturn.push(
+                        new OrderElevatorAction({
+                            distFloor: dist,
+                            elevatorId: action.payload.id
+                        })
+                    );
                 }
+
                 return actionsToReturn;
             }
         ),
     );
-
-    constructor(
-        private actions$: Actions,
-        private store: Store<any>) {
-
-    }
 
     /**
      * returns the fastest elevator that can come to given floor;
@@ -101,14 +102,15 @@ export class ExpertsEffects {
      */
     findElevator(floor) {
         let fastest;
+
         this.store
             .pipe(
                 select(selectAllElevators),
             )
             .subscribe(els => {
                 fastest = [...els].sort((a, b) => {
-                    return clacTime(a.finalFloor || a.destFloor || a.initFloor, floor, a.endTime)
-                        - clacTime(b.finalFloor || b.destFloor || b.initFloor, floor, b.endTime);
+                    return calcTime(a.finalFloor || a.destFloor || a.initFloor, floor, a.endTime)
+                        - calcTime(b.finalFloor || b.destFloor || b.initFloor, floor, b.endTime);
                 })[0]
             });
 
@@ -117,6 +119,7 @@ export class ExpertsEffects {
 
     getElevatorByID(id) {
         let elev;
+
         this.store
             .pipe(
                 select(getElevatorById(), {id}),
@@ -124,5 +127,10 @@ export class ExpertsEffects {
             .subscribe(els => elev = els);
 
         return elev
+    }
+
+    constructor(
+        private actions$: Actions,
+        private store: Store<any>) {
     }
 }
