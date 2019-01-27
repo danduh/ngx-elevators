@@ -1,5 +1,5 @@
 <div id="elevator-floors">
     <div *ngFor="let floor of floors" class='floor' (click)="selectFloor(floor)" [style.height.px]="floorSize">
-        <div [ngClass]="{'metal': true, 'active': floor.active}">{{floor.distFloor}}</div>
+        <div [ngClass]="{'metal': true, 'active': floor.active}">{{floor.floorId}}</div>
     </div>
 </div>

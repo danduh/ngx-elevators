@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { OrderElevatorAction } from '../store/actions';
+import { Floor } from '../app.types';
 import { FLOOR_SIZE } from '../app.constants';
 
 @Component({
@@ -9,13 +10,16 @@ import { FLOOR_SIZE } from '../app.constants';
     styleUrls: ['./floors.component.scss']
 })
 export class FloorsComponent implements OnInit {
+
     @Input() maxFloor = 10;
     @Input() minFloor = 0;
 
     @Output() floorSelected: EventEmitter<number> = new EventEmitter();
 
-    public floors: {}[];
+    public floors: Floor[];
     public floorSize: number = FLOOR_SIZE;
+
+    private floors$: any;
 
     constructor(private store: Store<any>) {
     }
@@ -37,8 +41,7 @@ export class FloorsComponent implements OnInit {
 
         for (let i = min; i <= max; i++) {
             floors.push({
-                distFloor: i,
-                active: false
+                floorId: i
             });
         }
 
