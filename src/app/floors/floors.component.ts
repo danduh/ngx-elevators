@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { getFloorEntities, selectElevatorsIDs } from '../store';
 import { OrderElevatorAction } from '../store/actions';
 import { Floor } from '../app.types';
 import { FLOOR_SIZE } from '../app.constants';
@@ -19,21 +21,50 @@ export class FloorsComponent implements OnInit {
     public floors: Floor[];
     public floorSize: number = FLOOR_SIZE;
 
-    private floors$: any;
+    private elevatorsIds: string[];
 
     constructor(private store: Store<any>) {
     }
 
     ngOnInit() {
         this.floors = this._createFloors(this.minFloor, this.maxFloor);
+
+        this.store
+            .pipe(
+                select(selectElevatorsIDs),
+                distinctUntilChanged()
+            )
+            .subscribe((elevatorsIds: string[]) => {
+                this.elevatorsIds = elevatorsIds;
+            });
+
+        this.store
+            .pipe(
+                select(getFloorEntities),
+                distinctUntilChanged()
+            )
+            .subscribe((floorEntities: {[key: number]: Floor}) => {
+                for (const floorId in floorEntities) {
+                    if (floorEntities.hasOwnProperty(floorId)) {
+                        if (this.floors[floorId].active && !floorEntities[floorId].active) {
+                            this._playDing();
+                        }
+
+                        this.floors[floorId].active = floorEntities[floorId].active;
+                    }
+                }
+            });
     }
 
     selectFloor(floor) {
-        this.store.dispatch(new OrderElevatorAction(floor));
+        floor.active = true;
 
-        if (!floor.active) {
-            this.floorSelected.emit(floor.distFloor)
+        if (this.elevatorsIds.length === 0) {
+            floor.active = false;
+            return;
         }
+
+        this.store.dispatch(new OrderElevatorAction(floor));
     }
 
     _createFloors(min, max) {
@@ -46,6 +77,11 @@ export class FloorsComponent implements OnInit {
         }
 
         return floors;
+    }
+
+    _playDing() {
+        const audio = new Audio('/assets/ding.mp3');
+        audio.play();
     }
 
 }
