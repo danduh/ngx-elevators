@@ -1,17 +1,16 @@
-import {Elevator} from '../elevators.types';
+import { Elevator } from '../app.types';
 
 export enum ElevatorActions {
-    ORDER_ELEVATOR = '[] Elevator ordered',
-    ADD_ELEVATOR = '[] Add Elevator',
-    SEND_ELEVATOR = '[] Send Elevator',
-    TO_BE_RELEASED = '[] Elevator Should to be released',
-    RELEASED = '[] Elevator released and free to use',
-
+    ORDER_ELEVATOR = '[ElevatorsActions] Elevator ordered',
+    ADD_ELEVATOR = '[ElevatorsActions] Add Elevator',
+    SEND_ELEVATOR = '[ElevatorsActions] Send Elevator',
+    TO_BE_RELEASED = '[ElevatorsActions] Elevator Should to be released',
+    RELEASED = '[ElevatorsActions] Elevator released and free to use',
 }
 
-
-export enum QueActions {
-    ADD_FLOOR_TO_QUE = '[] Add Floor to QUE'
+export enum FloorActions {
+    ADD_FLOOR = '[FloorActions] Add Floor',
+    UPDATE_FLOOR = '[FloorActions] Update Floor'
 }
 
 export class OrderElevatorAction {
@@ -54,8 +53,16 @@ export class ElevatorReleased {
     }
 }
 
-export class AddFloorToElevatorQue {
-    readonly type = QueActions.ADD_FLOOR_TO_QUE;
+export class AddFloor {
+    readonly type = FloorActions.ADD_FLOOR;
+
+    constructor(public payload) {
+
+    }
+}
+
+export class UpdateFloor {
+    readonly type = FloorActions.UPDATE_FLOOR;
 
     constructor(public payload) {
 

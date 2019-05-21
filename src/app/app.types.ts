@@ -9,7 +9,9 @@ export interface Elevator {
     que: number[];
 }
 
-export interface ElevQue {
-    elevatorId: string;
-    distFlor: number; // ID
+export interface Floor {
+    active?: boolean;
+    floorId: number;
+    elevatorId?: string;
+    que: string[];
 }

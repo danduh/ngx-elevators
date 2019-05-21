@@ -1,10 +1,8 @@
-import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
-import {Elevator, ElevQue} from '../elevators.types';
-import {ElevatorActions, QueActions} from './actions';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { Elevator, Floor } from '../app.types';
+import { ElevatorActions, FloorActions } from './actions';
 
-export interface ElevatorsState extends EntityState<Elevator> {
-}
-
+export interface ElevatorsState extends EntityState<Elevator> { }
 
 export const adapter: EntityAdapter<Elevator> =
     createEntityAdapter<Elevator>(
@@ -19,21 +17,14 @@ export const initialElevatorsState: ElevatorsState =
 export function elevatorReducer(state = initialElevatorsState, action) {
     switch (action.type) {
         case ElevatorActions.ADD_ELEVATOR: {
-
             return adapter.addOne(action.payload, state);
         }
 
         case ElevatorActions.SEND_ELEVATOR: {
-
             return adapter.updateOne(action.payload, state);
         }
         case ElevatorActions.RELEASED: {
-
             return adapter.updateOne(action.payload, state);
-        }
-        case QueActions.ADD_FLOOR_TO_QUE: {
-
-            return adapter.addOne(action.payload, state);
         }
 
         default:
@@ -41,26 +32,25 @@ export function elevatorReducer(state = initialElevatorsState, action) {
     }
 }
 
+export interface FloorState extends EntityState<Floor> { }
 
-export interface ElevQuesState extends EntityState<ElevQue> {
-}
-
-
-export const queAdapter: EntityAdapter<ElevQue> =
-    createEntityAdapter<ElevQue>(
+export const floorAdapter: EntityAdapter<Floor> =
+    createEntityAdapter<Floor>(
         {
-            selectId: (que: ElevQue) => que.elevatorId
+            selectId: (floor: Floor) => floor.floorId
         });
 
-export const initialQueElevatorsState: ElevQuesState = queAdapter.getInitialState();
+export const initialFloorState: FloorState = floorAdapter.getInitialState();
 
-
-export function queElevatorReducer(state = initialQueElevatorsState, action) {
+export function floorReducer(state = initialFloorState, action) {
     switch (action.type) {
 
-        case QueActions.ADD_FLOOR_TO_QUE: {
+        case FloorActions.ADD_FLOOR: {
+            return floorAdapter.addOne(action.payload, state);
+        }
 
-            return queAdapter.addOne(action.payload, state);
+        case FloorActions.UPDATE_FLOOR: {
+            return floorAdapter.upsertOne(action.payload, state);
         }
 
         default:

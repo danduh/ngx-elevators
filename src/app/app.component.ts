@@ -1,33 +1,25 @@
-import {Component} from '@angular/core';
-import {ElevatorsService} from './services/elevators.service';
-import {Store} from '@ngrx/store';
-import {AddElevatorActions} from './store/actions';
-import {guid} from './utils/uuid';
-import {Elevator} from './elevators.types';
+import { Component } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { AddElevatorActions } from './store/actions';
+import { guid } from './utils/uuid';
+import { APP_TITLE } from './app.constants';
+import { Elevator } from './app.types';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    providers: [ElevatorsService]
+    styleUrls: ['./app.component.scss']
 })
 
 export class AppComponent {
-    public title = 'Elevators App';
-    protected _defaultCurrentFloor: number = 0;
-    protected _defaultTimeBetweenFloors: number = 0.5;
-    protected _defaultStoppingTimeAtFloor: number = 2;
-    public elevatorIds: any = [];
-    elevatorsService;
-    private numbers: number = 0;
+    public title = APP_TITLE;
+    private numbers = 0;
 
-    constructor(elevatorsService: ElevatorsService,
-                private store: Store<any>) {
-    this.elevatorsService = elevatorsService;
+    constructor(private store: Store<any>) {
     }
 
     addElevator() {
-        const el: Elevator = {
+        const elevator: Elevator = {
             id: guid(),
             initFloor: 0,
             destFloor: null,
@@ -36,13 +28,10 @@ export class AppComponent {
             que: []
         };
 
-        this.store.dispatch(new AddElevatorActions(el));
-        let elevator = this.elevatorsService.addElevator(this._defaultStoppingTimeAtFloor, this._defaultTimeBetweenFloors, this._defaultCurrentFloor);
-        this.elevatorIds.push(elevator.getId());
+        this.store.dispatch(new AddElevatorActions(elevator));
     }
 
     onFloorSelected(floorNumber: number) {
-        // this.elevatorsService.addNewTask(floorNumber);
-    }
 
+    }
 }

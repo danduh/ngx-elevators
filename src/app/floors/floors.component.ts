@@ -1,67 +1,87 @@
-import * as _ from 'lodash';
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {ElevatorsService} from '../services/elevators.service';
-import AppConstants from './../constants';
-import {Store} from '@ngrx/store';
-import {OrderElevatorAction} from '../store/actions';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { select, Store } from '@ngrx/store';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { getFloorEntities, selectElevatorsIDs } from '../store';
+import { OrderElevatorAction } from '../store/actions';
+import { Floor } from '../app.types';
+import { FLOOR_SIZE } from '../app.constants';
 
 @Component({
     selector: 'app-floors',
     templateUrl: './floors.component.html',
-    styleUrls: ['./floors.component.scss'],
-    providers: [ElevatorsService]
+    styleUrls: ['./floors.component.scss']
 })
 export class FloorsComponent implements OnInit {
-    @Input() maxFloor: number = 10;
-    @Input() minFloor: number = 0;
+
+    @Input() maxFloor = 10;
+    @Input() minFloor = 0;
+
     @Output() floorSelected: EventEmitter<number> = new EventEmitter();
-    public floors: {}[];
-    elevatorsServiceEvents: any;
 
+    public floors: Floor[];
+    public floorSize: number = FLOOR_SIZE;
 
-    constructor(protected elevatorsService: ElevatorsService,
-                private store: Store<any>) {
-        this.elevatorsServiceEvents = elevatorsService.getEvents();
-        this.elevatorsServiceEvents.on('taskAdded', this.onTaskAdded.bind(this));
-        this.elevatorsServiceEvents.on('taskEnded', this.onTaskEnded.bind(this));
+    private elevatorsIds: string[];
+
+    constructor(private store: Store<any>) {
     }
 
     ngOnInit() {
         this.floors = this._createFloors(this.minFloor, this.maxFloor);
-    }
 
-    getFloorHeight() {
-        return AppConstants.FLOOR_SIZE_IN_PX + 'px'
-    }
+        this.store
+            .pipe(
+                select(selectElevatorsIDs),
+                distinctUntilChanged()
+            )
+            .subscribe((elevatorsIds: string[]) => {
+                this.elevatorsIds = elevatorsIds;
+            });
 
-    onTaskAdded(data) {
-        let floor: any = _.find(this.floors, {distFloor: data.task.getDestFloor()});
-        floor.active = true;
-    }
+        this.store
+            .pipe(
+                select(getFloorEntities),
+                distinctUntilChanged()
+            )
+            .subscribe((floorEntities: {[key: number]: Floor}) => {
+                for (const floorId in floorEntities) {
+                    if (floorEntities.hasOwnProperty(floorId)) {
+                        if (this.floors[floorId].active && !floorEntities[floorId].active) {
+                            this._playDing();
+                        }
 
-    onTaskEnded(data) {
-        let floor: any = _.find(this.floors, {distFloor: data.task.getDestFloor()});
-        floor.active = false;
+                        this.floors[floorId].active = floorEntities[floorId].active;
+                    }
+                }
+            });
     }
 
     selectFloor(floor) {
-        this.store.dispatch(new OrderElevatorAction(floor));
-        if (!floor.active) {
-            this.floorSelected.emit(floor.distFloor)
+        floor.active = true;
+
+        if (this.elevatorsIds.length === 0) {
+            floor.active = false;
+            return;
         }
+
+        this.store.dispatch(new OrderElevatorAction(floor));
     }
 
     _createFloors(min, max) {
-        let floors = [];
-        for (var i = min; i < (max + 1); i++) {
-            let floorObj = {
-                distFloor: i,
-                active: false
-            }
-            floors.push(floorObj);
+        const floors = [];
+
+        for (let i = min; i <= max; i++) {
+            floors.push({
+                floorId: i
+            });
         }
 
         return floors;
+    }
+
+    _playDing() {
+        const audio = new Audio('/assets/ding.mp3');
+        audio.play();
     }
 
 }
